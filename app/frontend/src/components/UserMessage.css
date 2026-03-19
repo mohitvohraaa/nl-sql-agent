@@ -1,0 +1,15 @@
+.user-message {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.user-bubble {
+  background: var(--accent2);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 16px 16px 4px 16px;
+  font-size: 14px;
+  max-width: 65%;
+  line-height: 1.6;
+  word-break: break-word;
+}

@@ -1,0 +1,105 @@
+.agent-message {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 100%;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Summary ── */
+.summary-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+/* ── SQL block ── */
+.sql-block {
+  background: #0e0e0e;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sql-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.sql-header:hover { background: var(--surface2); }
+
+.sql-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sql-chevron {
+  font-size: 11px;
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+
+.sql-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+.copy-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.06em;
+}
+
+.copy-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.sql-code {
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.75;
+  color: #7ec87e;
+  overflow-x: auto;
+  white-space: pre;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Error ── */
+.error-block {
+  background: rgba(255, 68, 68, 0.08);
+  border: 1px solid var(--error);
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--error);
+  line-height: 1.6;
+}
