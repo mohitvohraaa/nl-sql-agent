@@ -1,4 +1,3 @@
-# import google.generativeai as genai
 # import os
 from dotenv import load_dotenv
 from typing import Dict
@@ -51,8 +50,12 @@ def validate_sql_with_llm(sql: str) -> dict:
             max_tokens=256,
         )
         # return response.choices[0].message.content
-        cleaned = re.sub(r"```(?:json)?\s*", "", response.choices[0].message.content)
+        raw = response.choices[0].message.content
+        cleaned = re.sub(r"```(?:json)?\s*", "", raw)
         cleaned = re.sub(r"```", "", cleaned).strip()
+        start = cleaned.index("{")
+        end   = cleaned.rindex("}") + 1
+        cleaned = cleaned[start:end]
         return json.loads(cleaned)
     # except Exception as e:
     #     return {

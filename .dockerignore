@@ -1,0 +1,26 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Environment
+.env
+
+# Node
+app/frontend/node_modules/
+app/frontend/dist/
+app/frontend/build/
+
+# Git
+.git/
+.gitignore
+
+# GCP credentials
+*.json
+sa-key.json
+
+# OS
+.DS_Store

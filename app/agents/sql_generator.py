@@ -21,7 +21,6 @@ import re
 import sys
 import os
 
-import google.generativeai as genai
 
 # sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 # from config import GEMINI_API_KEY, GEMINI_MODEL

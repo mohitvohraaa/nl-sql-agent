@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: nl-sql-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - BIGQUERY_PROJECT_ID=${BIGQUERY_PROJECT_ID}
+      - BIGQUERY_DATASET=${BIGQUERY_DATASET}
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/adc.json
+    volumes:
+      - ~/.config/gcloud/application_default_credentials.json:/tmp/keys/adc.json:ro
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: nl-sql-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
