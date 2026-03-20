@@ -1,0 +1,98 @@
+stages:
+  - build
+  - push
+  - deploy
+
+variables:
+  BACKEND_IMAGE:  "mohitvohra/nl-sql-backend"
+  FRONTEND_IMAGE: "mohitvohra/nl-sql-frontend"
+  DOCKER_DRIVER:  overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+build_backend:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  script:
+    - docker build --platform linux/amd64 -f Dockerfile.backend -t "$BACKEND_IMAGE:$CI_COMMIT_SHA" -t "$BACKEND_IMAGE:latest" .
+    - docker save "$BACKEND_IMAGE:$CI_COMMIT_SHA" > backend.tar
+  artifacts:
+    paths:
+      - backend.tar
+    expire_in: 1 hour
+  only:
+    - main
+
+build_frontend:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  script:
+    - docker build --platform linux/amd64 -f Dockerfile.frontend -t "$FRONTEND_IMAGE:$CI_COMMIT_SHA" -t "$FRONTEND_IMAGE:latest" .
+    - docker save "$FRONTEND_IMAGE:$CI_COMMIT_SHA" > frontend.tar
+  artifacts:
+    paths:
+      - frontend.tar
+    expire_in: 1 hour
+  only:
+    - main
+
+push_backend:
+  stage: push
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  script:
+    - docker load < backend.tar
+    - docker push "$BACKEND_IMAGE:$CI_COMMIT_SHA"
+    - docker push "$BACKEND_IMAGE:latest"
+  dependencies:
+    - build_backend
+  only:
+    - main
+
+push_frontend:
+  stage: push
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  script:
+    - docker load < frontend.tar
+    - docker push "$FRONTEND_IMAGE:$CI_COMMIT_SHA"
+    - docker push "$FRONTEND_IMAGE:latest"
+  dependencies:
+    - build_frontend
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: google/cloud-sdk:alpine
+  before_script:
+    - echo "$GCP_SA_KEY" | base64 -d > /tmp/sa-key.json
+    - gcloud auth activate-service-account --key-file=/tmp/sa-key.json
+    - gcloud config set project "$GCP_PROJECT_ID"
+    - gcloud components install kubectl --quiet
+    - gcloud components install gke-gcloud-auth-plugin --quiet
+    - gcloud container clusters get-credentials "$GKE_CLUSTER_NAME" --zone "$GKE_CLUSTER_ZONE" --project "$GCP_PROJECT_ID"
+  script:
+    - kubectl set image deployment/backend backend="$BACKEND_IMAGE:$CI_COMMIT_SHA"
+    - kubectl set image deployment/frontend frontend="$FRONTEND_IMAGE:$CI_COMMIT_SHA"
+    - kubectl rollout status deployment/backend --timeout=120s
+    - kubectl rollout status deployment/frontend --timeout=120s
+    - kubectl get pods
+    - kubectl get ingress
+  environment:
+    name: production
+  only:
+    - main
