@@ -17,7 +17,7 @@ build_backend:
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
-    - docker build --platform linux/amd64 -f Dockerfile.backend -t "$BACKEND_IMAGE:$CI_COMMIT_SHA" -t "$BACKEND_IMAGE:latest" .
+    - docker build --platform linux/amd64 -f Dockerfile.backend -t "$BACKEND_IMAGE:$CI_COMMIT_SHA" .
     - docker save "$BACKEND_IMAGE:$CI_COMMIT_SHA" > backend.tar
   artifacts:
     paths:
@@ -34,7 +34,7 @@ build_frontend:
   before_script:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
-    - docker build --platform linux/amd64 -f Dockerfile.frontend -t "$FRONTEND_IMAGE:$CI_COMMIT_SHA" -t "$FRONTEND_IMAGE:latest" .
+    - docker build --platform linux/amd64 -f Dockerfile.frontend -t "$FRONTEND_IMAGE:$CI_COMMIT_SHA" .
     - docker save "$FRONTEND_IMAGE:$CI_COMMIT_SHA" > frontend.tar
   artifacts:
     paths:
@@ -52,6 +52,7 @@ push_backend:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - docker load < backend.tar
+    - docker tag "$BACKEND_IMAGE:$CI_COMMIT_SHA" "$BACKEND_IMAGE:latest"
     - docker push "$BACKEND_IMAGE:$CI_COMMIT_SHA"
     - docker push "$BACKEND_IMAGE:latest"
   dependencies:
@@ -68,6 +69,7 @@ push_frontend:
     - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
   script:
     - docker load < frontend.tar
+    - docker tag "$FRONTEND_IMAGE:$CI_COMMIT_SHA" "$FRONTEND_IMAGE:latest"
     - docker push "$FRONTEND_IMAGE:$CI_COMMIT_SHA"
     - docker push "$FRONTEND_IMAGE:latest"
   dependencies:
